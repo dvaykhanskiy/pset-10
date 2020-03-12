@@ -28,7 +28,6 @@ public class Functions {
         }
     }    
 
-//    Sorts DLM in ascending order
     public static DefaultListModel<String> sortWordsAsc(DefaultListModel<String> listOfWords) {
     	String temp;
     	int n = listOfWords.getSize();
