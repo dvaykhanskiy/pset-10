@@ -18,11 +18,11 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
 import javax.swing.event.ListSelectionEvent;
 
 import com.google.gson.Gson;
-//import com.google.gson.GsonBuilder;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -37,25 +37,20 @@ import javax.swing.JTextPane;
 import javax.swing.DropMode;
 import java.awt.FlowLayout;
 import javax.swing.BoxLayout;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 
-public class DictionaryApp {
+public class Dictionay {
 
-	private JFrame frmDic;
+	private JFrame frmDictionary;
 	private JTextField txtSearch;
-	private final Action add_action = new Add();
-	private final Action remove_action = new Remove();
+	private final ButtonGroup buttonGroup = new ButtonGroup();
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
+		getWords();
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					DictionaryApp window = new DictionaryApp();
-					window.frmDic.setVisible(true);
+					Dictionay window = new Dictionay();
+					window.frmDictionary.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -63,55 +58,217 @@ public class DictionaryApp {
 		});
 	}
 
+	private static DefaultListModel<String> getWords() throws FileNotFoundException{
+		Gson gson = new Gson();
+        String classpathDirectory = Functions.getClasspathDir();
+        BufferedReader br = new BufferedReader(new FileReader(classpathDirectory + "words.json"));
+        Words[] words = gson.fromJson(br, Words[].class);
+        DefaultListModel<String> listOfWords = new DefaultListModel<String>();
+        for (Words word : words) {
+        	listOfWords.addElement(word.getWord());
+        }
+       ;
+        return  Functions.sortWordsAsc(listOfWords);
+	}
+	
+//	get DLM of words sorted in asc order
+	private static ArrayList<Words> getWordClass() throws FileNotFoundException{
+		Gson gson = new Gson();
+        String classpathDirectory = Functions.getClasspathDir();
+        BufferedReader br = new BufferedReader(new FileReader(classpathDirectory + "words.json"));
+        Words[] words = gson.fromJson(br, Words[].class);
+        ArrayList<Words> listOfWords = new ArrayList<Words>();
+        for (Words word : words) {
+        	listOfWords.add(word);
+        }
+       ;
+        return listOfWords;
+	}
+
 	/**
 	 * Create the application.
+	 * @throws FileNotFoundException 
 	 */
-	public DictionaryApp() {
+	public Dictionay() throws FileNotFoundException {
 		initialize();
 	}
 
 	/**
-	 * Initialize the contents of the frmDic.
+	 * Initialize the contents of the frame.
+	 * @throws FileNotFoundException 
 	 */
-	private void initialize() {
-		frmDic = new JFrame("Dictionary");
-		frmDic.setBounds(100, 100, 450, 300);
-		frmDic.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmDic.getContentPane().setLayout(null);
+	private void initialize() throws FileNotFoundException {
+		frmDictionary = new JFrame();
+		frmDictionary.setResizable(false);
+		frmDictionary.setTitle("Dictionary");
+		frmDictionary.setBounds(100, 100, 800, 600);
+		frmDictionary.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmDictionary.getContentPane().setLayout(null);
 		
-		JButton btnAdd = new JButton("Add");
-		btnAdd.setAction(add_action);
-		btnAdd.setBounds(0, 0, 77, 29);
-		frmDic.getContentPane().add(btnAdd);
+		JScrollPane scrollPane_2 = new JScrollPane();
+		scrollPane_2.setBounds(207, 11, 566, 549);
+		frmDictionary.getContentPane().add(scrollPane_2);
 		
-		JButton btnRemove = new JButton("Remove");
-		btnRemove.setAction(remove_action);
-		btnRemove.setBounds(67, 0, 77, 29);
-		frmDic.getContentPane().add(btnRemove);
+		JTextPane textPane = new JTextPane();
+		textPane.setText("1. Example (pos)");
+		textPane.setEditable(false);
+		scrollPane_2.setViewportView(textPane);
+		StyledDocument doc = textPane.getStyledDocument();
+		DefaultCaret caret = (DefaultCaret) textPane.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+		
+		
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(12, 114, 179, 446);
+		frmDictionary.getContentPane().add(scrollPane_1);
+		
+		JList<String> list = new JList<String>();
+		list.addListSelectionListener(new ListSelectionListener() {
+			boolean ranOnce = false;
+			public void valueChanged(ListSelectionEvent arg0) {
+				if(ranOnce) {
+					ranOnce = false;
+				}else {
+					ranOnce = true;
+					
+					String selectedWord = list.getSelectedValue();
+					System.out.println(selectedWord);
+					
+					try {
+						ArrayList<Words> Words = getWordClass();
+						for(Words word: Words) {
+							if(word.getWord().equals(selectedWord)) {
+								doc.remove(0, doc.getLength());
+//								Style bigWord = textPane.addStyle()
+								Definitions[] definitions = word.getDefinitions();
+								int definitionCounter = 1;
+								for (Definitions definition : definitions) {
+									doc.insertString(doc.getLength(), definitionCounter + "." + selectedWord +" (" + definition.getPartOfSpeech() +")\n\n    "  +  definition.getDefinition() + "\n\n", null);
+									definitionCounter++;
+								}
+								
+							}
+						}
+					} catch (FileNotFoundException | BadLocationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}					
+				}				
+			}
+		});
+		scrollPane_1.setViewportView(list);
+		
+		DefaultListModel<String> DLM =  getWords();
+		
+		list.setModel(DLM);
+		
+		JButton btnNewButton = new JButton("Add");
+		btnNewButton.addActionListener(new ActionListener() {
+//			add
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("add");
+			}
+		});
+		btnNewButton.setBounds(2, 11, 89, 23);
+		frmDictionary.getContentPane().add(btnNewButton);
+		
+		JButton btnNewButton_1 = new JButton("Remove");
+		btnNewButton_1.addActionListener(new ActionListener() {
+//			remove
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("Remove");
+			}
+		});
+		btnNewButton_1.setBounds(101, 11, 89, 23);
+		frmDictionary.getContentPane().add(btnNewButton_1);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(490, 332, -57, -98);
+		frmDictionary.getContentPane().add(scrollPane);
+		
+		
+		
+
+		
+		JRadioButton rdbtnNewRadioButton = new JRadioButton("Asc");
+		buttonGroup.add(rdbtnNewRadioButton);
+		rdbtnNewRadioButton.setBounds(36, 78, 59, 23);
+		frmDictionary.getContentPane().add(rdbtnNewRadioButton);
+		rdbtnNewRadioButton.setSelected(true);
+		
+		JRadioButton rdbtnNewRadioButton_1 = new JRadioButton("Desc");
+		buttonGroup.add(rdbtnNewRadioButton_1);
+		rdbtnNewRadioButton_1.setBounds(110, 78, 59, 23);
+		frmDictionary.getContentPane().add(rdbtnNewRadioButton_1);
+		rdbtnNewRadioButton_1.addItemListener(new ItemListener() {
+//			 select asc or desc order
+		    @Override
+		    public void itemStateChanged(ItemEvent event) {
+		    	
+		        int state = event.getStateChange();
+		        if (state == ItemEvent.SELECTED) {		        	
+		            System.out.println("desc");
+		            try {
+		            	txtSearch.setText("");
+						list.setModel(Functions.reverseOrder(getWords()));
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		            
+		        } else if (state == ItemEvent.DESELECTED) {
+		        	System.out.println("asc");
+		        	try {
+		        		txtSearch.setText("");
+						list.setModel(getWords());
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}		 
+		        }
+		    }
+
+		});
 		
 		txtSearch = new JTextField();
-		txtSearch.setText("Search:");
-		txtSearch.setBounds(10, 30, 130, 26);
-		frmDic.getContentPane().add(txtSearch);
+		txtSearch.addKeyListener(new KeyAdapter() {
+			@Override
+//			search box
+			public void keyReleased(KeyEvent e) {
+				String searched = txtSearch.getText().toLowerCase();
+				System.out.println(searched);
+				DefaultListModel<String> words = new DefaultListModel<String>();
+				if (!rdbtnNewRadioButton.isSelected()) {		        	
+				    try {
+				    	words = Functions.reverseOrder(getWords());
+					} catch (FileNotFoundException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
+				    
+				} else {
+					try {
+						words = getWords();
+					} catch (FileNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}		 
+				}
+				DefaultListModel<String> filtered = new DefaultListModel<String>();
+				for(int i = 0 ; i < words.size(); i++) {
+					if((words.get(i).startsWith(searched))) {
+						System.out.println(words.get(i));
+						filtered.addElement(words.get(i));							
+					}
+				}
+				list.setModel(filtered);
+				  
+			}
+		});
+		txtSearch.setToolTipText("Search");
+		txtSearch.setBounds(12, 45, 179, 20);
+		frmDictionary.getContentPane().add(txtSearch);
 		txtSearch.setColumns(10);
-	}
-
-	private class Add extends AbstractAction {
-		public Add() {
-			putValue(NAME, "Add");
-			putValue(SHORT_DESCRIPTION, "Adds a word");
-		}
-		public void actionPerformed(ActionEvent e) {
-			System.out.println("add");
-		}
-	}
-	private class Remove extends AbstractAction {
-		public Remove() {
-			putValue(NAME, "Remove");
-			putValue(SHORT_DESCRIPTION, "Removes a word");
-		}
-		public void actionPerformed(ActionEvent e) {
-			System.out.println("remove");
-		}
 	}
 }
