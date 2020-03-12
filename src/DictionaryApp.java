@@ -202,7 +202,6 @@ public class Dictionay {
 		            	txtSearch.setText("");
 						list.setModel(Functions.reverseOrder(getWords()));
 					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 		            
