@@ -144,7 +144,6 @@ public class Dictionay {
 							}
 						}
 					} catch (FileNotFoundException | BadLocationException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}					
 				}				
