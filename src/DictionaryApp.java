@@ -71,7 +71,6 @@ public class Dictionay {
         return  Functions.sortWordsAsc(listOfWords);
 	}
 	
-//	get DLM of words sorted in asc order
 	private static ArrayList<Words> getWordClass() throws FileNotFoundException{
 		Gson gson = new Gson();
         String classpathDirectory = Functions.getClasspathDir();
