@@ -84,10 +84,7 @@ public class Dictionay {
         return listOfWords;
 	}
 
-	/**
-	 * Create the application.
-	 * @throws FileNotFoundException 
-	 */
+	
 	public Dictionay() throws FileNotFoundException {
 		initialize();
 	}
