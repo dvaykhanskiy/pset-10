@@ -89,10 +89,7 @@ public class Dictionay {
 		initialize();
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 * @throws FileNotFoundException 
-	 */
+	
 	private void initialize() throws FileNotFoundException {
 		frmDictionary = new JFrame();
 		frmDictionary.setResizable(false);
