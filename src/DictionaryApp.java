@@ -235,7 +235,6 @@ public class Dictionay {
 					try {
 						words = getWords();
 					} catch (FileNotFoundException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}		 
 				}
