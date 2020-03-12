@@ -228,7 +228,6 @@ public class Dictionay {
 				    try {
 				    	words = Functions.reverseOrder(getWords());
 					} catch (FileNotFoundException e2) {
-						// TODO Auto-generated catch block
 						e2.printStackTrace();
 					}
 				    
