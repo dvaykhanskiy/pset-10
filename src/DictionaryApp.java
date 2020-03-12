@@ -157,7 +157,6 @@ public class Dictionay {
 		
 		JButton btnNewButton = new JButton("Add");
 		btnNewButton.addActionListener(new ActionListener() {
-//			add
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("add");
 			}
