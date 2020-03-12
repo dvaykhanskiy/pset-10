@@ -1,7 +1,6 @@
 import javax.swing.DefaultListModel;
 
 public class Functions {
-//		Returns the classpath for json file
     public static String getClasspathDir() {
         String classpath = System.getProperty("java.class.path", ".");
         boolean windows = false;
